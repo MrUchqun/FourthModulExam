@@ -31,7 +31,7 @@ class MealsViewAdapter(private val meals: ArrayList<Meal>) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val meal: Meal = meals[position]
-        if (holder is MealsViewHolder){
+        if (holder is MealsViewHolder) {
             holder.image.setImageResource(meal.photo)
             holder.mealName.text = meal.name
             holder.price.text = "${meal.price} $"
@@ -43,4 +43,11 @@ class MealsViewAdapter(private val meals: ArrayList<Meal>) :
     override fun getItemCount(): Int {
         return meals.size
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setMeals(newMeals: ArrayList<Meal>) {
+        meals.addAll(newMeals)
+        notifyDataSetChanged()
+    }
+
 }

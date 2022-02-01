@@ -1,8 +1,9 @@
 package com.example.fourthmodulexam
 
-import android.graphics.drawable.GradientDrawable
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fourthmodulexam.adapter.MealsViewAdapter
@@ -12,6 +13,7 @@ import java.util.ArrayList
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private var count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +24,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViews() {
         recyclerView = findViewById(R.id.view_recycler)
-        recyclerView.layoutManager = GridLayoutManager(this, 1)
+        recyclerView.layoutManager = getLayoutManager()
+    }
+
+    private fun getLayoutManager(): GridLayoutManager {
+        val orientation: Int = this.resources.configuration.orientation
+        return if (orientation == Configuration.ORIENTATION_PORTRAIT)
+            GridLayoutManager(this, 1)
+        else
+            GridLayoutManager(this, 3)
     }
 
     private fun refreshAdapter() {
-        recyclerView.adapter = MealsViewAdapter(getMeals())
+        val adapter = MealsViewAdapter(getMeals())
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(1)){
+                    if (count < 5){
+                        adapter.setMeals(getMeals())
+                        Toast.makeText(this@MainActivity,"Loading...",Toast.LENGTH_SHORT).show()
+                        count++
+                    }
+                    else Toast.makeText(this@MainActivity,"You have showed all meals",Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+
+        recyclerView.adapter = adapter
     }
 
     private fun getMeals(): ArrayList<Meal> {
